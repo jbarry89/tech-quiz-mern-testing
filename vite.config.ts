@@ -10,6 +10,7 @@ export default defineConfig({
     setupFiles: './src/_tests_/setup.ts'
   },
   server: {
+    host:'localhost',
     port: 3001,
     open: false,
     proxy: {
@@ -21,3 +22,4 @@ export default defineConfig({
     }
   }
 })
+
