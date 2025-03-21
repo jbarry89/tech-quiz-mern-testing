@@ -30,7 +30,7 @@ describe('<Quiz /> Component Test', () => {
         typedQuestions.forEach((question) => {
           const answersLength = question.answers.length;
           const randomAnswerIndex = Cypress._.random(0, answersLength - 1);
-          cy.get('.btn.btn-primary').eq(randomAnswerIndex).click(); // Simulate answering
+          cy.get('.btn.btn-primary', {timeout: 5000}).should("be.visible").eq(randomAnswerIndex).click(); // Simulate answering
         });
   
         // Verify Quiz is completed message and score message displayed
@@ -40,6 +40,32 @@ describe('<Quiz /> Component Test', () => {
 
   });
 
+  it('should display the correct score at the end of the quiz', () => {
+   cy.mount(<Quiz />);
+   cy.contains('Start Quiz').click();
+   cy.wait('@getQuestions').then((interception) => {
+       const typedQuestions = interception.response?.body as typeof questions;
+       let correctAnswersCount = 0;
+
+       typedQuestions.forEach((question) => {
+           const answersLength = question.answers.length;
+           const randomAnswerIndex = Cypress._.random(0, answersLength - 1);
+           const correctAnswerIndex = question.answers.findIndex((answer) => answer.isCorrect);
+           cy.get('.btn.btn-primary').eq(randomAnswerIndex).click(); // Simulate answering
+         
+           if(correctAnswerIndex === randomAnswerIndex){
+               correctAnswersCount++;
+           }
+       
+       });
+       
+       cy.contains('Quiz Completed').should('be.visible');
+       cy.wait(500);
+       cy.contains(`Your score: ${correctAnswersCount}/${typedQuestions.length}`, {timeout: 9000}).should('be.visible');
+       
+   });
+
+  });
 
   it('should restart the quiz when "Take New Quiz" is clicked', () => {
     cy.mount(<Quiz />);
@@ -63,30 +89,5 @@ describe('<Quiz /> Component Test', () => {
   
    });
 
-   it('should display the correct score at the end of the quiz', () => {
-    cy.mount(<Quiz />);
-    cy.contains('Start Quiz').click();
-    cy.wait('@getQuestions').then((interception) => {
-        const typedQuestions = interception.response?.body as typeof questions;
-        let correctAnswersCount = 0;
-
-        typedQuestions.forEach((question) => {
-            const answersLength = question.answers.length;
-            const randomAnswerIndex = Cypress._.random(0, answersLength - 1);
-            const correctAnswerIndex = question.answers.findIndex((answer) => answer.isCorrect);
-            cy.get('.btn.btn-primary').eq(randomAnswerIndex).click(); // Simulate answering
-          
-            if(correctAnswerIndex === randomAnswerIndex){
-                correctAnswersCount++;
-            }
-        
-        });
-        
-        cy.contains('Quiz Completed').should('be.visible');
-        cy.contains(`Your score: ${correctAnswersCount}/${typedQuestions.length}`).should('be.visible');
-        
-    });
-
-   });
 
 });
