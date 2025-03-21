@@ -8,8 +8,7 @@ export default defineConfig({
         environment: 'jsdom',
         setupFiles: './src/_tests_/setup.ts'
     },
-    server: {
-        host: 'localhost',
+    server: {       
         port: 3001,
         open: false,
         proxy: {
